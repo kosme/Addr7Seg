@@ -4,7 +4,7 @@
 #define NUMDIGITS       4             //Number of DIGITs Daisy Chained.
 #define brightness 5
 
-Addr7Seg display = Addr7Seg(PIN, NUMDIGITS, NEO_GRB + NEO_KHZ800);
+Addr7Seg display = Addr7Seg(PIN, NUMDIGITS, NEO_GRB + NEO_KHZ400);
 
 
 void setup() {
