@@ -1034,8 +1034,8 @@ void Addr7Seg::show(void) {
 
   uint8_t          *p   = pixels,
                    *end = p + _numBytes, pix, mask;
-  volatile uint8_t *set = portSetRegister(pin),
-                   *clr = portClearRegister(pin);
+  volatile uint8_t *set = portSetRegister(_pin),
+                   *clr = portClearRegister(_pin);
   uint32_t          cyc;
 
   ARM_DEMCR    |= ARM_DEMCR_TRCENA;
@@ -1086,8 +1086,8 @@ void Addr7Seg::show(void) {
 #if F_CPU == 48000000
   uint8_t          *p   = pixels,
 		   pix, count, dly,
-                   bitmask = digitalPinToBitMask(pin);
-  volatile uint8_t *reg = portSetRegister(pin);
+                   bitmask = digitalPinToBitMask(_pin);
+  volatile uint8_t *reg = portSetRegister(_pin);
   uint32_t         num = _numBytes;
   asm volatile(
 	"L%=_begin:"				"\n\t"
@@ -1336,7 +1336,7 @@ void Addr7Seg::show(void) {
 //    pwm->INTEN |= (PWM_INTEN_SEQEND0_Enabled<<PWM_INTEN_SEQEND0_Pos);
 
     // PSEL must be configured before enabling PWM
-    pwm->PSEL.OUT[0] = g_ADigitalPinMap[pin];
+    pwm->PSEL.OUT[0] = g_ADigitalPinMap[_pin];
 
     // Enable the PWM
     pwm->ENABLE = 1;
@@ -1387,7 +1387,7 @@ void Addr7Seg::show(void) {
       __disable_irq();
     #endif
 
-    uint32_t pinMask = 1UL << g_ADigitalPinMap[pin];
+    uint32_t pinMask = 1UL << g_ADigitalPinMap[_pin];
 
     uint32_t CYCLES_X00     = CYCLES_800;
     uint32_t CYCLES_X00_T1H = CYCLES_800_T1H;
@@ -1460,8 +1460,8 @@ void Addr7Seg::show(void) {
   uint8_t  *ptr, *end, p, bitMask, portNum;
   uint32_t  pinMask;
 
-  portNum =  g_APinDescription[pin].ulPort;
-  pinMask =  1ul << g_APinDescription[pin].ulPin;
+  portNum =  g_APinDescription[_pin].ulPort;
+  pinMask =  1ul << g_APinDescription[_pin].ulPin;
   ptr     =  pixels;
   end     =  ptr + _numBytes;
   p       = *ptr++;
@@ -1535,8 +1535,8 @@ void Addr7Seg::show(void) {
   uint8_t  *ptr, *end, p, bitMask, portNum;
   uint32_t  pinMask;
 
-  portNum =  g_APinDescription[pin].ulPort;
-  pinMask =  1ul << g_APinDescription[pin].ulPin;
+  portNum =  g_APinDescription[_pin].ulPort;
+  pinMask =  1ul << g_APinDescription[_pin].ulPin;
   ptr     =  pixels;
   end     =  ptr + _numBytes;
   p       = *ptr++;
@@ -1613,14 +1613,14 @@ void Addr7Seg::show(void) {
   uint8_t  *ptr, *end, p, bitMask;
   uint32_t  pinMask;
 
-  pinMask =  BIT(PIN_MAP[pin].gpio_bit);
+  pinMask =  BIT(PIN_MAP[_pin].gpio_bit);
   ptr     =  pixels;
   end     =  ptr + _numBytes;
   p       = *ptr++;
   bitMask =  0x80;
 
-  volatile uint16_t *set = &(PIN_MAP[pin].gpio_device->regs->BSRRL);
-  volatile uint16_t *clr = &(PIN_MAP[pin].gpio_device->regs->BSRRH);
+  volatile uint16_t *set = &(PIN_MAP[_pin].gpio_device->regs->BSRRL);
+  volatile uint16_t *clr = &(PIN_MAP[_pin].gpio_device->regs->BSRRH);
 
 #ifdef NEO_KHZ400 // 800 KHz check needed only if 400 KHz support enabled
   if(is800KHz) {
@@ -1691,7 +1691,7 @@ void Addr7Seg::show(void) {
   uint8_t          *p   = pixels,
                     pix, count, mask;
   int32_t         num = _numBytes;
-  unsigned int bitmask = ( 1 << g_ADigitalPinMap[pin] );
+  unsigned int bitmask = ( 1 << g_ADigitalPinMap[_pin] );
 // https://github.com/sandeepmistry/arduino-nRF5/blob/dc53980c8bac27898fca90d8ecb268e11111edc1/variants/BBCmicrobit/variant.cpp
 
   volatile unsigned int *reg = (unsigned int *) (0x50000000UL + 0x508);
@@ -1789,8 +1789,8 @@ void Addr7Seg::show(void) {
     TC_CMR_WAVE | TC_CMR_WAVSEL_UP | TC_CMR_TCCLKS_TIMER_CLOCK1);
   TC_Start(TC1, 0);
 
-  pinMask   = g_APinDescription[pin].ulPin; // Don't 'optimize' these into
-  port      = g_APinDescription[pin].pPort; // declarations above.  Want to
+  pinMask   = g_APinDescription[_pin].ulPin; // Don't 'optimize' these into
+  port      = g_APinDescription[_pin].pPort; // declarations above.  Want to
   portSet   = &(port->PIO_SODR);            // burn a few cycles after
   portClear = &(port->PIO_CODR);            // starting timer to minimize
   timeValue = &(TC1->TC_CHANNEL[0].TC_CV);  // the initial 'while'.
@@ -1840,7 +1840,7 @@ void Addr7Seg::show(void) {
 // ESP8266 ----------------------------------------------------------------
 
   // ESP8266 show() is external to enforce ICACHE_RAM_ATTR execution
-  espShow(pin, pixels, _numBytes, is800KHz);
+  espShow(_pin, pixels, _numBytes, is800KHz);
 
 #elif defined(__ARDUINO_ARC__)
 
