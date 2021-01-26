@@ -8,6 +8,8 @@
 //#define NRF52_DISABLE_INT
 #endif
 
+//#define DEBUG
+
 Addr7Seg::Addr7Seg(uint8_t pin, uint8_t digits, neoPixelType t):
   _begun(false), pixels(NULL), _endTime(0)
 {
@@ -16,7 +18,7 @@ Addr7Seg::Addr7Seg(uint8_t pin, uint8_t digits, neoPixelType t):
   updateType(t);
   // _numChips=digits*3;
   updateLength(digits*3);
-  memset(setDEC, 0, digits);
+  setDEC = (uint8_t *) malloc(digits * sizeof(uint8_t));
   for (uint8_t x = 0; x < digits; x++) {
     setDEC[x] = 0;
   }
@@ -1956,17 +1958,21 @@ void Addr7Seg::writeDigit(uint8_t digit, uint8_t num, uint8_t brightness)
 
   uint8_t BIT[8] = {0, 0, 0, 0, 0, 0, 0, 0};
   uint8_t SET[8] = {0, 0, 0, 0, 0, 0, 0, 0};
+#ifdef DEBUG
   Serial.print(num);
   Serial.print(" ");
   Serial.println(numGRB[num], BIN);
+#endif
   for (int x = 0; x < 8; x++) {
 
     BIT[x] = bitRead(numGRB[num], x);
     if (BIT[x]) {
       SET[x] = brightness;
     }
+#ifdef DEBUG
     Serial.print(SET[x]);
     Serial.print(", ");
+#endif
   }
   if (setDEC[digit] == 1) {
     SET[4] = brightness;
@@ -1974,23 +1980,25 @@ void Addr7Seg::writeDigit(uint8_t digit, uint8_t num, uint8_t brightness)
   else {
     SET[4] = 0;
   }
+#ifdef DEBUG
   Serial.println();
+#endif
   setSubSegment(firstChip++, SET[0], SET[1], SET[2]);
   setSubSegment(firstChip++, SET[3], SET[4], SET[5]);
   setSubSegment(firstChip++, SET[6], SET[7], SET[8]);
 }
 
 void Addr7Seg::slideDown(int digit) {
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 0, 100);
+  clearDigit(digit);
+  setSeg(digit, 0, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 7, 100);
+  clearDigit(digit);
+  setSeg(digit, 7, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 5, 100);
+  clearDigit(digit);
+  setSeg(digit, 5, 100);
   show();
   delay(100);
 }
@@ -2031,72 +2039,72 @@ void Addr7Seg::changeDEC(int digit)
 
 void Addr7Seg::slideUp(int digit)
 {
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 5, 100);
+  clearDigit(digit);
+  setSeg(digit, 5, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 7, 100);
+  clearDigit(digit);
+  setSeg(digit, 7, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 0, 100);
+  clearDigit(digit);
+  setSeg(digit, 0, 100);
   show();
   delay(100);
 }
 
 void Addr7Seg::rotateCW(int digit)
 {
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 0, 100);
+  clearDigit(digit);
+  setSeg(digit, 0, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 2, 100);
+  clearDigit(digit);
+  setSeg(digit, 2, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 3, 100);
+  clearDigit(digit);
+  setSeg(digit, 3, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 5, 100);
+  clearDigit(digit);
+  setSeg(digit, 5, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 6, 100);
+  clearDigit(digit);
+  setSeg(digit, 6, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 1, 100);
+  clearDigit(digit);
+  setSeg(digit, 1, 100);
   show();
   delay(100);
 }
 
 void Addr7Seg::rotateCCW(int digit)
 {
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 0, 100);
+  clearDigit(digit);
+  setSeg(digit, 0, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 1, 100);
+  clearDigit(digit);
+  setSeg(digit, 1, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 6, 100);
+  clearDigit(digit);
+  setSeg(digit, 6, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 5, 100);
+  clearDigit(digit);
+  setSeg(digit, 5, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 3, 100);
+  clearDigit(digit);
+  setSeg(digit, 3, 100);
   show();
   delay(100);
-  clearDigit(digit * 3);
-  setSeg(digit * 3, 2, 100);
+  clearDigit(digit);
+  setSeg(digit, 2, 100);
   show();
   delay(100);
 }
